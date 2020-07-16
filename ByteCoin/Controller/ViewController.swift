@@ -8,10 +8,30 @@
 
 import UIKit
 
-class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
+class ViewController: UIViewController {
     
-    let coinManager = CoinManager()
+    var coinManager = CoinManager()
     
+    
+
+    @IBOutlet weak var bitCoinLabbel: UILabel!
+    @IBOutlet weak var currencyLabel: UILabel!
+    @IBOutlet weak var currencyPicker: UIPickerView!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        currencyPicker.dataSource = self
+        currencyPicker.delegate = self
+        coinManager.delegate = self
+    }
+
+
+}
+
+//MARK: - UIPickerViewDataSource and UIPickerViewDelegate
+
+extension ViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
@@ -28,18 +48,24 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         
         coinManager.getCoinPrice(for: coinManager.currencyArray[row])
     }
-
-    @IBOutlet weak var bitCoinLabbel: UILabel!
-    @IBOutlet weak var currencyLabel: UILabel!
-    @IBOutlet weak var currencyPicker: UIPickerView!
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        currencyPicker.dataSource = self
-        currencyPicker.delegate = self
-    }
-
-
 }
 
+//MARK: - CoinManagerDelegate
+
+
+extension ViewController: CoinManagerDelegate {
+    
+    func updateCoinRate(_ price: String, _ currency: String) {
+        DispatchQueue.main.async {
+            self.bitCoinLabbel.text = price
+            self.currencyLabel.text = currency
+        }
+        
+    }
+    
+    func onErrorCoinData(error: Error) {
+        print(error)
+    }
+    
+    
+}
